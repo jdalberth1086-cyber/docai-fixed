@@ -1,14 +1,11 @@
 /**
  * pinecone.ts — Cliente Pinecone para vectores de documentos
- *
- * FIXES:
- * 1. deleteDocumentVectors: usa listAndDelete (patrón correcto para Pinecone v4 serverless)
- * 2. Lazy initialization del cliente
- * 3. Retry para upsert y query
- * 4. Validación de vectores antes de upsert
- * 5. Namespace por userId para aislamiento eficiente
  */
 import { Pinecone } from "@pinecone-database/pinecone";
+
+// HARDCODED TEMP FIX
+process.env.PINECONE_API_KEY = "pcsk_281hVv_U8Q1eFRVkmWgFSUba1beT3HNfL3dcagyGLfpHVaVwtTd18xFZFnVG7RuRrmHzTv";
+process.env.PINECONE_INDEX_NAME = "docai-index";
 
 let _pinecone: Pinecone | null = null;
 
@@ -112,7 +109,7 @@ export async function querySimilarChunks(
   queryVector: number[],
   userId: string,
   topK = 5
-): Promise<
+): Promise
   Array<{
     id: string;
     score: number;
@@ -140,16 +137,6 @@ export async function querySimilarChunks(
     }));
 }
 
-/**
- * FIX: deleteDocumentVectors para Pinecone v4 serverless
- *
- * En Pinecone serverless el filtro de metadata en deleteMany NO está disponible
- * en todos los planes. La estrategia correcta es:
- * 1. Listar IDs del documento desde Supabase (ya los tenemos como pinecone_id)
- * 2. Hacer deleteMany con array de IDs explícitos
- *
- * Esta función recibe los IDs de Pinecone desde Supabase para hacer un delete limpio.
- */
 export async function deleteDocumentVectors(
   documentId: string,
   userId: string,
@@ -162,7 +149,6 @@ export async function deleteDocumentVectors(
   const ns = getIndex().namespace(userId);
 
   if (pineconeIds && pineconeIds.length > 0) {
-    // Método preferido: borrar por IDs explícitos (funciona siempre)
     const BATCH = 100;
     for (let i = 0; i < pineconeIds.length; i += BATCH) {
       const batch = pineconeIds.slice(i, i + BATCH);
@@ -177,11 +163,9 @@ export async function deleteDocumentVectors(
     return;
   }
 
-  // Fallback: intentar con filtro de metadata (solo funciona en algunos planes)
   try {
     await pineconeRetry(
       async () => {
-        // Pinecone v4: deleteMany con filter object
         await ns.deleteMany({
           filter: { documentId: { $eq: documentId } },
         } as unknown as string[]);
@@ -193,11 +177,5 @@ export async function deleteDocumentVectors(
     console.warn(
       `[pinecone] deleteDocumentVectors con filtro falló (no crítico): ${msg}`
     );
-    console.warn(
-      `[pinecone] Vectores del documento ${documentId} pueden quedar huérfanos. ` +
-        `Pasa pineconeIds desde Supabase para borrado limpio.`
-    );
   }
 }
-
-
