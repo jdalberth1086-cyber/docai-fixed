@@ -3,9 +3,6 @@
  */
 import { Pinecone } from "@pinecone-database/pinecone";
 
-// HARDCODED TEMP FIX
-process.env.PINECONE_API_KEY = "pcsk_281hVv_U8Q1eFRVkmWgFSUba1beT3HNfL3dcagyGLfpHVaVwtTd18xFZFnVG7RuRrmHzTv";
-process.env.PINECONE_INDEX_NAME = "docai-index";
 
 let _pinecone: Pinecone | null = null;
 
