@@ -1,0 +1,48 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "functions": {
+    "src/app/api/documents/process/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    },
+    "src/app/api/chat/route.ts": {
+      "maxDuration": 60,
+      "memory": 512
+    },
+    "src/app/api/documents/delete-vectors/route.ts": {
+      "maxDuration": 15,
+      "memory": 256
+    },
+    "src/app/api/tareas/submit/route.ts": {
+      "maxDuration": 30,
+      "memory": 512
+    },
+    "src/app/api/tareas/list/route.ts": {
+      "maxDuration": 10,
+      "memory": 256
+    },
+    "src/app/api/tareas/historial/route.ts": {
+      "maxDuration": 10,
+      "memory": 256
+    },
+    "src/app/api/tareas/update/route.ts": {
+      "maxDuration": 10,
+      "memory": 256
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, no-cache, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
+
