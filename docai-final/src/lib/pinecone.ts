@@ -108,8 +108,8 @@ export async function upsertVectors(
 export async function querySimilarChunks(
   queryVector: number[],
   userId: string,
-  topK = 5
-): Promise
+  topK: number = 5
+): Promise<
   Array<{
     id: string;
     score: number;
