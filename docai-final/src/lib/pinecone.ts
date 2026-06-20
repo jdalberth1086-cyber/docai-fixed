@@ -17,7 +17,7 @@ function getPinecone(): Pinecone {
   return _pinecone;
 }
 
-const INDEX_NAME = process.env.PINECONE_INDEX_NAME ?? "Orbit-index";
+const INDEX_NAME = process.env.PINECONE_INDEX_NAME || "docai-index";
 const UPSERT_BATCH_SIZE = 100;
 
 export interface VectorMetadata {
